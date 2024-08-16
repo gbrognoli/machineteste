@@ -1,0 +1,44 @@
+import pandas as pd
+from google.colab import drive
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+
+# Monta o Google Drive
+drive.mount('/content/drive')
+
+# Abre o arquivo com todos os dados
+data = pd.read_excel('/content/drive/MyDrive/dataset_tablet_smartphone.xlsx')
+
+# Exibe o tipo de dados de cada coluna
+print(data.dtypes)
+
+# Substitui os valores categóricos por valores numéricos
+cleanup = {"Portatil": {"Smartphone": 1, "Tablet": 2}}
+data.replace(cleanup, inplace=True)
+
+# Exibe as primeiras linhas do DataFrame após a substituição
+print(data.head())
+
+# Separa as variáveis dependente (y) e independentes (X)
+y = data['Portatil']
+X = data.drop(columns=['Portatil'])
+
+# Divide os dados em conjuntos de treino e teste
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
+
+# Cria e treina o modelo de árvore de decisão
+clf = DecisionTreeClassifier()
+clf.fit(X_train, y_train)
+
+# Faz previsões com o conjunto de teste
+y_pred = clf.predict(X_test)
+
+# Exibe os resultados
+print("Resultados obtidos: ")
+print(y_pred)
+print("\nResultados esperados: ")
+print(y_test.values)
+
+# Calcula e exibe a precisão do modelo
+print("Precision: " + str(metrics.precision_score(y_test, y_pred, average='weighted')))
